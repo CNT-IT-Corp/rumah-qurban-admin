@@ -5,14 +5,19 @@ on:
 
 jobs:
   force-owner-commit:
-    if: "!contains(github.event.head_commit.message, 'trigger vercel build')"
+    if: github.event.head_commit.message != 'trigger vercel build' && (github.actor == 'irvandrian2025' || github.actor == 'ravenhunt')
+
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.OWNER_TOKEN }}
+          fetch-depth: 0
 
       - name: Set git identity (owner)
         run: |
@@ -34,6 +39,6 @@ jobs:
 
           git commit -m "trigger vercel build"
 
-      - name: Push commit
+      - name: Push using owner token
         run: |
-          git push
+          git push origin HEAD:main
